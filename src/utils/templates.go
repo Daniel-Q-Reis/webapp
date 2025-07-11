@@ -11,7 +11,7 @@ var templates *template.Template
 
 // CarregarTemplates insere os templates html na variável templates
 func CarregarTemplates() {
-	//Aqui pegaremos os arquivos que estão dentro da pasta views e pode pegar os arquivos que sejam qqr coisa *.html
+	//Aqui pegaremos os arquivos que estão dentro da pasta views do nosso programa e pode pegar os arquivos que sejam qqr coisa *.html
 	templates = template.Must(template.ParseGlob("views/*.html")) //template. é o package
 }
 

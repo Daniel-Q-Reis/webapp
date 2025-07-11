@@ -36,7 +36,7 @@ This repository hosts the frontend application for a social network. It is desig
     ```bash
     go run main.go
     ```
-    The server will start on `http://localhost:8080`.
+    The server will start on `http://localhost:3000`.
 
 ## Contributing
 
