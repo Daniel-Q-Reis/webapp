@@ -3,7 +3,6 @@ package controllers
 import (
 	"bytes"
 	"encoding/json"
-	"log"
 	"net/http"
 	"webapp/src/respostas"
 )
@@ -23,7 +22,8 @@ func CriarUsuario(w http.ResponseWriter, r *http.Request) {
 		"senha": r.FormValue("senha"),
 	})
 	if erro != nil {
-		log.Fatal(erro)
+		respostas.JSON(w, http.StatusBadRequest, respostas.ErroAPI{Erro: erro.Error()})
+		return
 	}
 
 	//bytes.NewBuffer faz com que a gente consiga ler os slices do JSON em string
@@ -31,9 +31,15 @@ func CriarUsuario(w http.ResponseWriter, r *http.Request) {
 
 	response, erro := http.Post("http://localhost:5000/usuarios", "application/json", bytes.NewBuffer(usuario))
 	if erro != nil {
-		log.Fatal(erro)
+		respostas.JSON(w, http.StatusInternalServerError, respostas.ErroAPI{Erro: erro.Error()})
+		return
 	}
 	defer response.Body.Close() //é obrigatório, mesmo que o corpo do response.body esteja vazio
+
+	if response.StatusCode >= 400 {
+		respostas.TratarStatusCodeDeErro(w, response)
+		return //o return é para nao chegar no respostas.JSON abaixo e me dar a resposta duas vezes
+	}
 
 	respostas.JSON(w, response.StatusCode, nil)
 }
