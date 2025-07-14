@@ -3,9 +3,9 @@ package controllers
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
+	"webapp/src/respostas"
 )
 
 //Aqui ficarão as rotas relativas a manipulação de usuários
@@ -35,5 +35,5 @@ func CriarUsuario(w http.ResponseWriter, r *http.Request) {
 	}
 	defer response.Body.Close() //é obrigatório, mesmo que o corpo do response.body esteja vazio
 
-	fmt.Println(response.Body)
+	respostas.JSON(w, response.StatusCode, nil)
 }

@@ -21,5 +21,9 @@ function criarUsuario(evento) {
             nick: $('#nick').val(),
             senha: $('#senha').val(),
         }
+    }).done(function() { //o ajax sabe fazer a diferença entre o que deu certo ou deu errado, pois se o statusCode vier no range dos 200, ex: 201, 204, 200.. ele sabe que sao retornos de sucesso
+        alert("Usuário cadastrado com sucesso!")
+    }).fail(function() { //status na casa dos 400 ou 500, ele sabe que deve buscar aqui
+        alert("Erro ao cadastrar o usuário!")
     });
 }
