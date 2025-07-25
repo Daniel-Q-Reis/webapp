@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
+	"webapp/src/config"
+	"webapp/src/modelos"
 	"webapp/src/respostas"
 )
 
@@ -28,12 +29,37 @@ func FazerLogin(w http.ResponseWriter, r *http.Request) { //a rota que vai fazer
 	}
 
 	//chegando nesse ponto podemos fazer a requisição na api
-	response, erro := http.Post("http://localhost:5000/login", "application/json", bytes.NewBuffer(usuario)) //será para uma variavel de ambiente mais para frente .env, pois se precisar trocar o endereço no futuro e mais facil
+	url := fmt.Sprintf("%s/login", config.APIURL)                                  //%s aqui equivale a http://localhost:5000
+	response, erro := http.Post(url, "application/json", bytes.NewBuffer(usuario)) //era: ("http://localhost:5000/login", ""application/json, bytes...) será para uma variavel de ambiente mais para frente .env, pois se precisar trocar o endereço no futuro e mais facil -> agora : url := fmt.Sprintf("%s/login", config.APIURL)
 	if erro != nil {
 		respostas.JSON(w, http.StatusInternalServerError, respostas.ErroAPI{Erro: erro.Error()})
 		return
 	}
-	token, _ := io.ReadAll(response.Body)
-	//para ler esse response.Body que é do tipo io.ReadCloser, precisamos da func acima io.ReadAll(response.Body) (ele passa um slice de byte, vamos converter para string, string(token))
-	fmt.Println(response.Status, string(token)) //por hora somente para saber se deu certo ->string(token) -> equivale a response.Body
+	defer response.Body.Close()
+
+	if response.StatusCode >= 400 {
+		respostas.TratarStatusCodeDeErro(w, response) //que veio ali do http.Post()
+		return
+	}
+
+	var DadosAutenticacao modelos.DadosAutenticacao //struct criada para retornar o ID e o Token separados
+	if erro = json.NewDecoder(response.Body).Decode(&DadosAutenticacao); erro != nil {
+		respostas.JSON(w, http.StatusUnprocessableEntity, respostas.ErroAPI{Erro: erro.Error()})
+		return
+	}
+
+	// Nesse momento eu tenhos as informacoes de autenticação desse usuario salvo na variavel DadosAutenticação
+	// Então preciso salvar esses dados em algum lugar para não perder eles (pois não queremos que o usuário ao mudar de pagina perca seu login)
+	// então vou pegar esses dados e salvar dentro de um Browser do usuário através de um cookie, existe um pacote de go especifico para isso
+	// o cookie então será utilizado em todas as rotas para que assim eu veja de forma segura se o usuário está autenticado
+	// Após implementar-mos isso tudo vamos dar um resposta simples la pro nosso ajax, não vamos passar nada nela, vai ser somente um: respostas.Json(w, http.StatusOK, nil)
+	// Logo não iremos devolver esses dados da autenticação... eles vao ser usados somente pelo COOKIE e vai ficar salvo no browser do usuário
+	// Essa forma e muito comum quando usamos JWT (Jason web token), cria um token e devolve para o usuá rio
+	// Para isso vamos criar agora nosso package config que vai conter as variaveis de ambiente dentro de nossa aplicação web
+	// Vamos fazer isso antes de mexer com os dados de autenticação porque vamos precisar de duas informações para criação do cookie
+	// eles vao estar armazenados em variaveis de ambiente, são bem parecidas com o secret key que geramos na api para a geração do token
+	// ai ja vamos aproveitar para colocar a URL da API em uma variável de ambiene
+	// Vamos criar entao dentro de SRC uma pasta CONFIG/config. com package config
+
+	respostas.JSON(w, http.StatusOK, nil)
 }

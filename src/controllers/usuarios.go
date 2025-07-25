@@ -3,7 +3,9 @@ package controllers
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"webapp/src/config"
 	"webapp/src/respostas"
 )
 
@@ -29,8 +31,8 @@ func CriarUsuario(w http.ResponseWriter, r *http.Request) {
 
 	//bytes.NewBuffer faz com que a gente consiga ler os slices do JSON em string
 	//Abrindo comunicação bastante simples com a nossa API, já que por enquanto até aqui não precisamos de autenticação
-
-	response, erro := http.Post("http://localhost:5000/usuarios", "application/json", bytes.NewBuffer(usuario))
+	url := fmt.Sprintf("%s/usuarios", config.APIURL)                               //%s aqui equivale a http://localhost:5000 /usuarios
+	response, erro := http.Post(url, "application/json", bytes.NewBuffer(usuario)) //url pegou a variavel de ambiente config.APIURL = url = http://localhost:5000/usuarios
 	if erro != nil {
 		respostas.JSON(w, http.StatusInternalServerError, respostas.ErroAPI{Erro: erro.Error()})
 		return
