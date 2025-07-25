@@ -21,6 +21,7 @@ func CriarUsuario(w http.ResponseWriter, r *http.Request) {
 		"nick":  r.FormValue("nick"),
 		"senha": r.FormValue("senha"),
 	})
+
 	if erro != nil {
 		respostas.JSON(w, http.StatusBadRequest, respostas.ErroAPI{Erro: erro.Error()})
 		return

@@ -17,7 +17,7 @@ func JSON(w http.ResponseWriter, statusCode int, dados any) {
 	w.WriteHeader(statusCode)
 
 	if erro := json.NewEncoder(w).Encode(dados); erro != nil { //da um json enconde nos dados que estão vindo na requisição
-		log.Fatal(erro)
+		log.Fatal(erro) // em produção posso querer usar um log.Panic ou um mecanismo de recuperação
 	}
 }
 
