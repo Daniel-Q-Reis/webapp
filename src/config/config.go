@@ -39,4 +39,4 @@ func Carregar() {
 	APIURL = os.Getenv("API_URL")
 	HashKey = []byte(os.Getenv("HASH_KEY"))
 	BlockKey = []byte(os.Getenv("BLOCK_KEY"))
-} //agora podemos chamar essa função la dentro do main
+} //agora podemos chamar essa função la dentro do main, através do config.Carregar()

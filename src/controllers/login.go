@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"webapp/src/config"
+	"webapp/src/cookies"
 	"webapp/src/modelos"
 	"webapp/src/respostas"
 )
@@ -60,6 +61,12 @@ func FazerLogin(w http.ResponseWriter, r *http.Request) { //a rota que vai fazer
 	// eles vao estar armazenados em variaveis de ambiente, são bem parecidas com o secret key que geramos na api para a geração do token
 	// ai ja vamos aproveitar para colocar a URL da API em uma variável de ambiene
 	// Vamos criar entao dentro de SRC uma pasta CONFIG/config. com package config
+
+	//agora vamos chamar a função salvar cookies lá do package cookies
+	if erro = cookies.Salvar(w, DadosAutenticacao.ID, DadosAutenticacao.Token); erro != nil {
+		respostas.JSON(w, http.StatusUnprocessableEntity, respostas.ErroAPI{Erro: erro.Error()})
+		return
+	}
 
 	respostas.JSON(w, http.StatusOK, nil)
 }

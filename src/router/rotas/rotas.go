@@ -2,6 +2,7 @@ package rotas
 
 import (
 	"net/http"
+	"webapp/src/middlewares"
 
 	"github.com/gorilla/mux"
 )
@@ -18,9 +19,20 @@ type Rota struct {
 func Configurar(router *mux.Router) *mux.Router {
 	rotas := rotasLogin
 	rotas = append(rotas, rotasUsuarios...)
+	rotas = append(rotas, rotaPaginaPrincipal)
 
 	for _, rota := range rotas {
-		router.HandleFunc(rota.URI, rota.Funcao).Methods(rota.Metodo)
+		//O que vamos fazer aqui é, se precisar autenticar, eu vou chamar também a função autenticar do middleware
+		if rota.RequerAutenticacao {
+			router.HandleFunc(rota.URI,
+				middlewares.Logger(middlewares.Autenticar(rota.Funcao)),
+			).Methods(rota.Metodo)
+		} else { //se caso não precise de autenticação, é so fazer o logger, sem o autenticar
+			router.HandleFunc(rota.URI,
+				middlewares.Logger(rota.Funcao),
+			).Methods(rota.Metodo)
+		}
+
 	}
 
 	//fileserver irá apontar para o Go onde estão os arquivos que iremos usar para estilo quanto os arquivos java script
