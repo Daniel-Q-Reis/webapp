@@ -14,3 +14,4 @@ type Publicacao struct {
 }
 
 //Aqui todos os campos estão sendo mapeados para json, pois vamos trabalhar com json
+//Em publicação não teremos nenhum metodo, pois as questões de formatação serão feitas quando formos cadastrar uma publicação a gente vai usar um map, assim como na criação de usuarios

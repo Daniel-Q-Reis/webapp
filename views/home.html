@@ -3,16 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página Principal</title>
+    <title>Gopher</title>
+    <link href="/assets/css/bootstrap.css" rel="stylesheet"/>
 </head>
 <body>
-    <h2>Página Principal!</h2>
 
-    {{ range .Publicacoes }}
-        <h4> Título: {{ .Titulo }}</h4>
-        <h4> Conteudo: {{ .Conteudo }}</h4>
+    {{ define "cabecalho"}} <!-- Criando o template que vamos chamar posteriormente -->
+       <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">GopherSocial</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-principal" aria-controls="navbar-principal" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbar-principal">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/home">Página Principal</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/perfil">Meu Perfil</a>
+        </li>
 
-        <hr>
-        {{ end }}
+        <li class="nav-item">
+            <form class="d-flex" role="search" action="/buscar-usuarios" method="GET">
+                <input class="form-control me-2" type="search" placeholder="Buscar Usuários" id="usuario" name="usuario" required="required" aria-label="Search"/>
+            </form>
+        </li>
+      </ul>
+      
+      <span class="navbar-text p-0">
+        <a href="/logout">Sair</a>
+      </span>
+    </div>
+  </div>
+</nav>
+    {{ end }}
+
+    {{template "cabecalho"}}
+ 
+
+    <div class="container-fluid">
+        <div class="row mt-4"><!-- cada linha (linha), mt = margintop, tem have com grid, pode ter até 12 colunas, aqui estamos setando 4 como default, ou seja vai ocupar 1/3 da tela independente da resolução -->
+            <div class="col-xs-12 col-sm-12 col-md-5 col-lg-5 col-xl-5"><!-- xs e sm = Para telas muito pequenas vai usar 12 colunas da linha(maximo) , demais 5 colunas-->
+                <!-- Formulario-->
+                <h3>Nova Publicação</h3>
+                <fieldset>
+                    <form id="nova-publicacao">
+                        <div class="form-group">
+                            <label for="titulo">Título</label>
+                            <input type="text" class="form-control" id="titulo" name="titulo" required="required"
+                                 placeholder="Insira o título da sua publicação">
+                        </div>
+                        <!-- Criação do Conteudo para postar-->
+                        <div class="form-group">
+                             <label for="conteudo">Conteúdo</label>
+                            <textarea class="form-control" id="conteudo" name="conteudo" required="required"
+                            placeholder="Insira o conteúdo da sua publicação"></textarea>
+                        </div>
+
+                        <!-- Criação do botão para postar --><!--type=submit é que vai enviar esse formulario-->
+                         <button class="btn btn-primary" type="submit"><!-- btn = botao do bootstrap e btn-primary e a cor meio azulada-->
+                            Publicar
+                         </button>
+                    </form>
+                </fieldset>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 col-xl-7"><!-- Aqui em tela pequenas como ambas ocupam 12, vai ficar um embaixo do outro, telas grandes um do lado do outro-->
+                {{ range . }}
+                <!--Publicações-->
+                <!-- Para o displya das publicações na tela, vamos utilizar o jumbotron do bootstrap -->
+                 <div class="container-fluid bg-light p-5 rounded mb-4 text-center">
+                    <h1 class="display-4"> {{ .Titulo }} </h1>
+                    <p class="lead"> {{ .Conteudo }} </p>
+                    <a href="#"> {{ .AutorNick }} - {{ .CriadaEm }} </a> <!--se passar um campo que não existe ele não da erro, mas quebra-->
+                    <hr class="my-4">
+                    <p>Botões</p>
+                </div>
+                {{ end }}
+            </div>
+        </div>
+    </div>
+    <!-- Antes de fechar o body, colocar um rodapé-->
+
+    <footer class="text=muted mt-4">
+        <div class="container">
+            <p>
+                GopherSocial 2025. All rights reserved
+            </p>
+        </div>
+    </footer>
+    <!-- Para criação do menu responsivo (interativo) precisamos importar o bootstrap e o jquery-->
+    <script src="/assets/js/jquery.js"></script>
+    <script src="/assets/js/bootstrap.js"></script>
 </body>
 </html>
