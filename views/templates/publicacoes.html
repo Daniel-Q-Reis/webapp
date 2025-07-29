@@ -1,0 +1,46 @@
+{{ define "curtidas" }}
+<i class="fa-solid fa-heart"></i><!--Icone pertecente ao fontawesome, vindo de scritps.html-->
+<span> {{ .Curtidas }} </span>  <!--está em modelos publicacao.go Curtidas (vai me dar um valor Uint) o curtidas depois é so pra escrever na tela-->
+{{ end }}
+
+{{ define "editar" }}
+<a href="/editar" style="text-decoration: none;">
+    <i class="fa-solid fa-pen-to-square"></i><!--Icone pertecente ao fontawesome, vindo de scritps.html-->
+</a>
+{{ end }}
+
+{{ define "deletar" }}
+<a href="/deletar" style="text-decoration: none;">
+    <i class="fa-solid fa-trash text-danger"></i><!--Icone pertecente ao fontawesome, vindo de scritps.html-->
+</a>
+{{ end }}
+<!-- independente se tem permissao ou não o cabecalho será o mesmo, logo compensa fazer esse template separado-->
+{{ define "cabecalho-publicacao" }} 
+    <h1 class="display-4"> {{ .Titulo }} </h1>
+    <p class="lead"> {{ .Conteudo }} </p>
+    <a href="#"> {{ .AutorNick }} - {{ .CriadaEm.Format "02/01/2006" }} </a>  <!-- no Brasil usa assim, nos USA usa 01/02/2006, go reconhece 02 como dia e 01 como mes o 3 é hora, 4min, 5 seg, 6/06/006/2006 ano-->
+    <hr class="my-4">
+{{end}}
+
+<!--nao precisamos passar nada como parametro, so de ter o . la no home, 
+ele já vai indentificar que esse template vai ter alguams coisas para serem executadas 
+dentro dele relativas a publicacao que está sendo passada-->
+{{ define "publicacao-com-permissao" }} 
+    <div class="container-fluid bg-light p-5 rounded mb-4 text-center" data-publicacao-id="{{ .ID }}"> <!--data-publicacao é importante pois conseguimos verificar antes de editar curtir ou excluir a qual publicacao estamos nos referindo-->
+        {{ template "cabecalho-publicacao" . }}
+        <p>
+            {{ template "curtidas" . }}
+            {{ template "editar" }}
+            {{ template "deletar" }}
+        </p>
+    </div>
+{{ end }}
+
+{{ define "publicacao-sem-permissao" }}
+    <div class="container-fluid bg-light p-5 rounded mb-4 text-center" data-publicacao-id="{{ .ID }}">
+        {{ template "cabecalho-publicacao" . }}
+        <p>
+            {{ template "curtidas" . }}
+        </p>
+    </div>
+{{ end }}

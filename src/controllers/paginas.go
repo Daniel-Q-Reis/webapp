@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"webapp/src/config"
+	"webapp/src/cookies"
 	"webapp/src/modelos"
 	"webapp/src/requisicoes"
 	"webapp/src/respostas"
@@ -49,14 +51,18 @@ func CarregarPaginaPrincipal(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// cookie, _ := cookies.Ler(r)
-	// usuarioID, _ := strconv.ParseUint(cookie["id"], 10, 64)
+	// Implementando se uma publicação la na pagina inicial pertence ou não ao usuário que está logado
+	cookie, _ := cookies.Ler(r)
+	usuarioID, _ := strconv.ParseUint(cookie["id"], 10, 64) //tem que converter para uint pois vamos comparar com o autorID da publicação, e os tipos tem que ser iguais, essa comparação será feita dentro do arquivo html, usando os templates do go
+	// se chegar até aqui não precisa de tratamento de erros,pois sabemos que não irá dar erro, pois já passou pelo middleware que havalia o erro, e se der erro, irá retornar ao login, e não vai renderizar a pagina home
 
-	utils.ExecutarTemplate(w, "home.html", publicacoes)
-	// 		Publicacoes []modelos.Publicacao
-	// 		UsuarioID   uint64
-	// 	}{
-	// 		Publicacoes: publicacoes,
-	// 		UsuarioID:   usuarioID,
-	// 	})
+	//depois que eu tiver os valores do usuarioID, podemos fazer a struct no executarTemplate
+	utils.ExecutarTemplate(w, "home.html", struct {
+		Publicacoes []modelos.Publicacao
+		UsuarioID   uint64
+	}{
+		Publicacoes: publicacoes,
+		UsuarioID:   usuarioID,
+	})
+	//como agora estamos passando mais de um campo (Publicacoes e UsuarioID) pra pagina, devemos ir no home.html e referenciar esses campo (antes estava só publicacoes como range ., agora {{range .Publicacoes}})
 }
