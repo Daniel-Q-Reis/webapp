@@ -19,9 +19,14 @@ import (
 
 // Carregar tela de login renderiza a tela de login
 func CarregarTelaDeLogin(w http.ResponseWriter, r *http.Request) {
+	//Aqui vamos verificar se o usuário já está autenticado, pois se ele estiver, vamos redireciona-lo para a pagina /home, ao invés de executar utils.ExecutarTemplate(w, "login.html", nil)
+	cookie, _ := cookies.Ler(r) //aqui teremos o Map e vamos verificar se a propriedade cookie não está em branco, se não estiver vamos dar o redirect para o home
+	if cookie["token"] != "" {
+		http.Redirect(w, r, "/home", http.StatusFound) //302
+		return
+	}
 	//login.html é o nome do , terceiro argumento é nil, pois não iremos jogar nenhum dado variavel na tela de login, será sempre um conteúdo fixo
 	utils.ExecutarTemplate(w, "login.html", nil) //esses arquivos vão se encontrar na pasta views da aplicação
-
 }
 
 // CarregarPaginaDeCadastroDeUsuario carrega a página de cadastro de usuário
