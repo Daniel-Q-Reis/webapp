@@ -65,12 +65,14 @@ func Ler(r *http.Request) (map[string]string, error) { // esse primeiro valor s�
 }
 
 // Deletar remove os valores armazenados no cookie
-func Deletar(w http.ResponseWriter) {
+func Deletar(w http.ResponseWriter) { //aqui não precisa de request, somente do response
+	//Aqui basicamente estaremos sobrescrevendo o que foi setado no salvar, e o tornando um valor em branco, assim o usuário irá perder o acesso ao token, podendo assim efetuar o logout
 	http.SetCookie(w, &http.Cookie{
 		Name:     "dados",
-		Value:    "",
+		Value:    "", //agora o valor é em branco
 		Path:     "/",
 		HttpOnly: true,
-		Expires:  time.Unix(0, 0),
+		Expires:  time.Unix(0, 0), //tempo de expiração de cookie, não foi passado na criação (assim ele fica com valor padrão se não passar nada), aqui o tempo como zero, 0,0, significa que ele já está expirado
+		//consequentimente limpando o cookie
 	})
 }
