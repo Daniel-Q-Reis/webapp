@@ -68,5 +68,6 @@ func FazerLogin(w http.ResponseWriter, r *http.Request) { //a rota que vai fazer
 		return
 	}
 
-	respostas.JSON(w, http.StatusOK, nil)
+	respostas.JSON(w, http.StatusOK, nil) // ->esse estava dando erro ao comunicar com o jquery por algum motivo, vou tentar arrumar depois
+	//respostas.JSON(w, http.StatusNoContent, nil)
 }

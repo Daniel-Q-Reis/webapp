@@ -11,18 +11,20 @@ import (
 	"webapp/src/requisicoes"
 	"webapp/src/respostas"
 	"webapp/src/utils"
+
+	"github.com/gorilla/mux"
 )
 
 //Neste arquivo, ficam todas as funções que irão renderizar as paginas
 
-// Carregar tela de login irá carregar a tela de login
+// Carregar tela de login renderiza a tela de login
 func CarregarTelaDeLogin(w http.ResponseWriter, r *http.Request) {
 	//login.html é o nome do , terceiro argumento é nil, pois não iremos jogar nenhum dado variavel na tela de login, será sempre um conteúdo fixo
 	utils.ExecutarTemplate(w, "login.html", nil) //esses arquivos vão se encontrar na pasta views da aplicação
 
 }
 
-// CarregarPaginaDeCadastroDeUsuario vai carregar a página de cadastro de usuário
+// CarregarPaginaDeCadastroDeUsuario carrega a página de cadastro de usuário
 func CarregarPaginaDeCadastroDeUsuario(w http.ResponseWriter, r *http.Request) {
 	utils.ExecutarTemplate(w, "cadastro.html", nil)
 }
@@ -65,4 +67,36 @@ func CarregarPaginaPrincipal(w http.ResponseWriter, r *http.Request) {
 		UsuarioID:   usuarioID,
 	})
 	//como agora estamos passando mais de um campo (Publicacoes e UsuarioID) pra pagina, devemos ir no home.html e referenciar esses campo (antes estava só publicacoes como range ., agora {{range .Publicacoes}})
+}
+
+// CarregarPaginaDeAtualizacaoDePublicacao carrega a pagina de edição de publicação
+func CarregarPaginaDeAtualizacaoDePublicacao(w http.ResponseWriter, r *http.Request) {
+	parametros := mux.Vars(r)
+	publicacaoID, erro := strconv.ParseUint(parametros["publicacaoId"], 10, 64)
+	if erro != nil {
+		respostas.JSON(w, http.StatusBadRequest, respostas.ErroAPI{Erro: erro.Error()})
+		return
+	}
+
+	url := fmt.Sprintf("%s/publicacoes/%d", config.APIURL, publicacaoID) //vai pegar uma unica publicação especifica para atualizar/atualizar
+	response, erro := requisicoes.FazerRequisicaoComAutenticacao(r, http.MethodGet, url, nil)
+	if erro != nil {
+		respostas.JSON(w, http.StatusInternalServerError, respostas.ErroAPI{Erro: erro.Error()})
+		return
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode >= 400 {
+		respostas.TratarStatusCodeDeErro(w, response)
+		return
+	}
+
+	var publicacao modelos.Publicacao
+	if erro = json.NewDecoder(response.Body).Decode(&publicacao); erro != nil {
+		respostas.JSON(w, http.StatusUnprocessableEntity, respostas.ErroAPI{Erro: erro.Error()})
+		return
+	}
+
+	//Chegando aqui sem erros, vamos jogar essa publicação na tela
+	utils.ExecutarTemplate(w, "atualizar-publicacao.html", publicacao)
 }

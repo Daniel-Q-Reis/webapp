@@ -1,18 +1,16 @@
 {{ define "curtidas" }}
-<i class="fa-solid fa-heart"></i><!--Icone pertecente ao fontawesome, vindo de scritps.html-->
-<span> {{ .Curtidas }} </span>  <!--está em modelos publicacao.go Curtidas (vai me dar um valor Uint) o curtidas depois é so pra escrever na tela-->
+<i class="fas fa-heart curtir-publicacao" style="cursor: pointer;"></i><!--Icone pertecente ao fontawesome, vindo de scritps.html-->
+<span> {{ .Curtidas }} </span> <!--está em modelos publicacao.go Curtidas (vai me dar um valor Uint) o curtidas depois é so pra escrever na tela-->
 {{ end }}
 
 {{ define "editar" }}
-<a href="/editar" style="text-decoration: none;">
-    <i class="fa-solid fa-pen-to-square"></i><!--Icone pertecente ao fontawesome, vindo de scritps.html-->
+<a href="/publicacoes/{{ .ID }}/atualizar" style="text-decoration: none;"><!--Rota que vai carregar a pagina de edição-->
+    <i class="fas fa-edit"></i><!--Icone pertecente ao fontawesome, vindo de scritps.html-->
 </a>
 {{ end }}
 
 {{ define "deletar" }}
-<a href="/deletar" style="text-decoration: none;">
-    <i class="fa-solid fa-trash text-danger"></i><!--Icone pertecente ao fontawesome, vindo de scritps.html-->
-</a>
+<i class="fas fa-trash text-danger deletar-publicacao" style="cursor: pointer;"></i>
 {{ end }}
 <!-- independente se tem permissao ou não o cabecalho será o mesmo, logo compensa fazer esse template separado-->
 {{ define "cabecalho-publicacao" }} 
@@ -30,8 +28,8 @@ dentro dele relativas a publicacao que está sendo passada-->
         {{ template "cabecalho-publicacao" . }}
         <p>
             {{ template "curtidas" . }}
-            {{ template "editar" }}
-            {{ template "deletar" }}
+            {{ template "editar" . }}
+            {{ template "deletar" . }}
         </p>
     </div>
 {{ end }}

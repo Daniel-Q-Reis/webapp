@@ -4,10 +4,9 @@ $('#formulario-cadastro').on('submit', criarUsuario)
 
 function criarUsuario(evento) {
     evento.preventDefault();
-    console.log("Dentro da funcao usuario"); //fmt.Println() -> so que loga la no console do browser (vai imprimir la) e não no VsCode
 
     if ( $('#senha').val() != $('#confirmar-senha').val()) { //o jquery vai procurar as infomações la no html que possuam esses nomes, e vai pegar o valor deles
-        alert("As senhas não coincidem!"); //vai aparecer um pop-up na tela, dizendo isso
+        Swal.fire("Ops...", "As senhas não coincidem!", "error"); //vai aparecer um pop-up na tela, dizendo isso
         return;
     }
 
@@ -21,10 +20,23 @@ function criarUsuario(evento) {
             nick: $('#nick').val(),
             senha: $('#senha').val(),
         }
-    }).done(function() { //o ajax sabe fazer a diferença entre o que deu certo ou deu errado, pois se o statusCode vier no range dos 200, ex: 201, 204, 200.. ele sabe que sao retornos de sucesso
-        alert("Usuário cadastrado com sucesso!");
-    }).fail(function(erro) { //status na casa dos 400 ou 500, ele sabe que deve buscar aqui
-        console.log(erro);
-        alert("Erro ao cadastrar o Usuário!");
+ }).done(function() {
+        Swal.fire("Sucesso!", "Usuário cadastrado com sucesso!", "success")
+            .then(function() {
+                $.ajax({
+                    url: "/login",
+                    method: "POST",
+                    data: {
+                        email: $('#email').val(),//Aqui como email e senha acabaram de ser cadastrados, sempre vai dar certo
+                        senha: $('#senha').val()
+                    }
+                }).done(function() {
+                    window.location = "/home";//logo depois de criar o usuário, já somos redirecionados para tela principal
+                }).fail(function() {
+                    Swal.fire("Ops...", "Erro ao autenticar o usuário!", "error");
+                })
+            })
+    }).fail(function() {
+        Swal.fire("Ops...", "Erro ao cadastrar o usuário!", "error");
     });
 }

@@ -30,7 +30,7 @@
                 <a href="login"> Clique aqui para fazer o login</a>
                 <button type="submit" class="btn-gopher">Cadastrar</button>
                 <!--Integrando o jquery a este html-->
-                <script src="/assets/js/jquery.js"></script>
+                {{ template "scripts" }} <!--Nesse caso o jquery já está contemplado dentro dos scripts, assim como outros, logo não precisamos importar de forma separada-->
                 <script src="/assets/js/cadastro.js"></script>
             </form>
         </div>
