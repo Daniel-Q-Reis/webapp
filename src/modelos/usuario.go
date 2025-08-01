@@ -62,7 +62,7 @@ func BuscarUsuarioCompleto(usuarioID uint64, r *http.Request) (Usuario, error) {
 
 		case seguindoCarregados := <-canalSeguindo:
 			if seguindoCarregados == nil {
-				return Usuario{}, errors.New("erro ao buscar os seguidores")
+				return Usuario{}, errors.New("erro ao buscar quem o usuário está seguindo")
 			}
 
 			seguindo = seguindoCarregados
