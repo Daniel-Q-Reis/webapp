@@ -133,3 +133,35 @@ func CarregarPaginaDeUsuarios(w http.ResponseWriter, r *http.Request) {
 
 	utils.ExecutarTemplate(w, "usuarios.html", usuarios)
 }
+
+// CarregarPerfilDoUsuario carrega a página do perfil do usuário
+func CarregarPerfilDoUsuario(w http.ResponseWriter, r *http.Request) {
+	parametros := mux.Vars(r)
+	usuarioID, erro := strconv.ParseUint(parametros["usuarioId"], 10, 64)
+	if erro != nil {
+		respostas.JSON(w, http.StatusBadRequest, respostas.ErroAPI{Erro: erro.Error()})
+		return
+	}
+
+	cookie, _ := cookies.Ler(r)
+	usuarioLogadoID, _ := strconv.ParseUint(cookie["id"], 10, 64)
+
+	if usuarioID == usuarioLogadoID {
+		http.Redirect(w, r, "/perfil", 302)
+		return
+	}
+
+	usuario, erro := modelos.BuscarUsuarioCompleto(usuarioID, r) //Precisamos do request, pois vamos precisar do token para autenticar na API, depois vai distribuir esse token por todas as chamadas
+	if erro != nil {
+		respostas.JSON(w, http.StatusInternalServerError, respostas.ErroAPI{Erro: erro.Error()})
+		return
+	}
+
+	utils.ExecutarTemplate(w, "usuario.html", struct {
+		Usuario         modelos.Usuario
+		UsuarioLogadoID uint64
+	}{
+		Usuario:         usuario,
+		UsuarioLogadoID: usuarioLogadoID,
+	})
+}
