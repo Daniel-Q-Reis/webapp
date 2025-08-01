@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"webapp/src/config"
 	"webapp/src/cookies"
 	"webapp/src/modelos"
@@ -104,4 +105,31 @@ func CarregarPaginaDeAtualizacaoDePublicacao(w http.ResponseWriter, r *http.Requ
 
 	//Chegando aqui sem erros, vamos jogar essa publicação na tela
 	utils.ExecutarTemplate(w, "atualizar-publicacao.html", publicacao)
+}
+
+// CarregarPaginaDeUsuarios carrega a página com os usuários que atendem o filtro passado
+func CarregarPaginaDeUsuarios(w http.ResponseWriter, r *http.Request) {
+	//Aqui vamos pegar o dado da URL que está sendo buscado pelo usuario, usuario=...
+	nomeOuNick := strings.ToLower(r.URL.Query().Get("usuario"))             //nome que está vindo antes do = na URL ex: usuario=usuario3 (chave, valor no mapa)
+	url := fmt.Sprintf("%s/usuarios?usuario=%s", config.APIURL, nomeOuNick) //ai ja mandamos para a API qual a URL completa e qual a Query, para podermos fazer nossa requisição (GET)
+
+	response, erro := requisicoes.FazerRequisicaoComAutenticacao(r, http.MethodGet, url, nil)
+	if erro != nil {
+		respostas.JSON(w, http.StatusInternalServerError, respostas.ErroAPI{Erro: erro.Error()})
+		return
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode >= 400 {
+		respostas.TratarStatusCodeDeErro(w, response)
+		return
+	}
+	//Vamos criar um slice de Usuario e vamos popular ele com a resposta da API, ele vai ser um pouco diferente do []modelos.Usuario da API
+	var usuarios []modelos.Usuario //aqui para trazer para pagina web, ele vai ter algumas informações que não estavamos trazendo na API por padrão, motivo está relacionado quando estivermos carregando o perfil de cada um dos usuários
+	if erro = json.NewDecoder(response.Body).Decode(&usuarios); erro != nil {
+		respostas.JSON(w, http.StatusUnprocessableEntity, respostas.ErroAPI{Erro: erro.Error()})
+		return
+	}
+
+	utils.ExecutarTemplate(w, "usuarios.html", usuarios)
 }
