@@ -147,9 +147,11 @@ func CarregarPerfilDoUsuario(w http.ResponseWriter, r *http.Request) {
 	usuarioLogadoID, _ := strconv.ParseUint(cookie["id"], 10, 64)
 
 	if usuarioID == usuarioLogadoID {
-		http.Redirect(w, r, "/perfil", 302)
+		http.Redirect(w, r, "/perfil", http.StatusFound) //redirecionamos para pagina de perfil do usuario
 		return
 	}
+
+	//Verificamos se o usuarioID é igual o usuariologado antes de BuscarUsuarioCompleto, pois não tem sentido executar isso, se estiver se tratando de nós mesmos
 
 	usuario, erro := modelos.BuscarUsuarioCompleto(usuarioID, r) //Precisamos do request, pois vamos precisar do token para autenticar na API, depois vai distribuir esse token por todas as chamadas
 	if erro != nil {
@@ -164,4 +166,46 @@ func CarregarPerfilDoUsuario(w http.ResponseWriter, r *http.Request) {
 		Usuario:         usuario,
 		UsuarioLogadoID: usuarioLogadoID,
 	})
+}
+
+// CarregarPerfilDoUsuarioLogado carrega a página do perfil do usuário logado
+func CarregarPerfilDoUsuarioLogado(w http.ResponseWriter, r *http.Request) {
+	cookie, _ := cookies.Ler(r)
+	usuarioID, _ := strconv.ParseUint(cookie["id"], 10, 64)
+
+	usuario, erro := modelos.BuscarUsuarioCompleto(usuarioID, r)
+	if erro != nil {
+		respostas.JSON(w, http.StatusInternalServerError, respostas.ErroAPI{Erro: erro.Error()})
+		return
+	}
+
+	utils.ExecutarTemplate(w, "perfil.html", usuario)
+}
+
+// CarregarPaginaDeEdicaoDeUsuario carrega a página para edição dos dados do usuário
+func CarregarPaginaDeEdicaoDeUsuario(w http.ResponseWriter, r *http.Request) {
+	cookie, _ := cookies.Ler(r)
+	usuarioID, _ := strconv.ParseUint(cookie["id"], 10, 64)
+
+	//Aqui somente vamos utilizar goroutines e canal unica e exclusivamente pois BuscarDadosDoUsuario já estava escrita lá dessa forma, mas não é algo tipico de ser feito
+	canal := make(chan modelos.Usuario)
+	go modelos.BuscarDadosDoUsuario(canal, usuarioID, r)
+	usuario := <-canal
+
+	//aqui temos que refazer essa condição pois ela não esta sendo usada dentro do select uma vez que o select existe apenas para BuscarUsuarioCompleto
+	if usuario.ID == 0 {
+		respostas.JSON(w, http.StatusInternalServerError, respostas.ErroAPI{Erro: "Erro ao buscar o usuário"})
+		return
+	}
+
+	utils.ExecutarTemplate(w, "editar-usuario.html", usuario)
+}
+
+// CarregarPaginaDeAtualizacaoDeSenha carrega a página para atualização da senha do usuário
+func CarregarPaginaDeAtualizacaoDeSenha(w http.ResponseWriter, r *http.Request) {
+	//Aqui não precisamos buscar nenhum dado para renderizar ela, serão 3 campos, senha atual, senha nova e confirmar senha nova
+	//logo para carregar a pagina, não é necessario nenhuma informação
+	//Unica verificação necessaria aqui, será no banco de dados, onde iremos verificar se a senha atual está correspondendo com a cadastrada lá
+	//Mas isso será feito após eu fazer a requisição na api para carregar a senha em si
+	utils.ExecutarTemplate(w, "atualizar-senha.html", nil)
 }

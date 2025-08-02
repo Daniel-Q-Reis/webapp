@@ -118,8 +118,11 @@ func BuscarSeguidores(canal chan<- []Usuario, usuarioID uint64, r *http.Request)
 		return
 	}
 
+	//Aqui vamos mandar um slice vazio no lugar de um nil, apesar de estarmos recebendo um nil da API, isso não deve quebrar a aplicação
+	//Na verdade esse nil apenas sinaliza que realmente o usuario não possui mais seguidores, então se mandarmos o slice vazio para o canal
+	//o programa vai retornar que a pessoa possui zero seguidores, ao invés de quebrar a app
 	if seguidores == nil {
-		canal <- make([]Usuario, 0)
+		canal <- make([]Usuario, 0) //slice vazio
 		return
 	}
 

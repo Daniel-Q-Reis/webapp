@@ -16,8 +16,8 @@
 {{ define "cabecalho-publicacao" }} 
     <h1 class="display-4"> {{ .Titulo }} </h1>
     <p class="lead"> {{ .Conteudo }} </p>
-    <a href="#"> {{ .AutorNick }} - {{ .CriadaEm.Format "02/01/2006" }} </a>  <!-- no Brasil usa assim, nos USA usa 01/02/2006, go reconhece 02 como dia e 01 como mes o 3 é hora, 4min, 5 seg, 6/06/006/2006 ano-->
-    <hr class="my-4">
+    <a href="/usuarios/{{ .AutorID }}"> {{ .AutorNick }} - {{ .CriadaEm.Format "02/01/2006" }} </a>  <!-- no Brasil usa assim, nos USA usa 01/02/2006, go reconhece 02 como dia e 01 como mes o 3 é hora, 4min, 5 seg, 6/06/006/2006 ano-->
+    <hr class="my-4"><!--/usuarios/{{ .AutorID }} -> vai levar para o perfil do usuario-->
 {{end}}
 
 <!--nao precisamos passar nada como parametro, so de ter o . la no home, 

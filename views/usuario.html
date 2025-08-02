@@ -29,11 +29,11 @@
                         </h6>
 
                         <p class="card-text">
-                            <a href="#" data-toggle="modal" data-target="#modal-seguidores">
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#modal-seguidores">
                                 Seguidores: {{ len .Usuario.Seguidores }}<!--Como seguidores é um slice, podemos fazer um len dele para descobrir quantos seguidores o user possui-->
                             </a>
                         </p>
-                        <p class="card-text" data-toggle="modal" data-target="#modal-seguindo">
+                        <p class="card-text" data-bs-toggle="modal" data-bs-target="#modal-seguindo">
                             <a href="#">
                                 Seguindo: {{ len .Usuario.Seguindo }}
                             </a>
@@ -87,7 +87,7 @@
     {{ template "rodape" }}
     {{ template "scripts" }}
 
-    <script src="/assets/js/publicacoes.js"></script>
+    <script src="/assets/js/publicacoes.js?v=1"></script>
     <script src="/assets/js/usuario.js"></script>
 </body>
 
